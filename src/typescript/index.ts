@@ -88,6 +88,30 @@ server.registerTool(
       }
     });
 
+    lines.push("計画データ");
+
+    $(".Plan__ActivityRecord").each((_, record) => {
+      const label = $(record).find(".Plan__ActivityRecord__Label").text().trim();
+      const score = $(record).find(".Plan__ActivityRecord__Score").text().trim();
+      if (label) {
+        lines.push(`${label}: ${score}`);
+      }
+    });
+
+    const courseHeading = $(".CourseConstant__Heading").text().trim();
+    const courseDifficulty = $(".CourseConstant__DifficultyLevel").text().trim();
+    const courseValue = $(".CourseConstant__Value").text().trim();
+    if (courseHeading) {
+      lines.push(`${courseHeading}: ${courseValue} (${courseDifficulty})`);
+    }
+
+    const paceHeading = $(".PaceMultiplier__Heading").text().trim();
+    const paceLabel = $(".PaceMultiplier__Rate__Label").text().trim();
+    const paceValue = $(".PaceMultiplier__Rate__Value__Number").text().trim();
+    if (paceHeading) {
+      lines.push(`${paceHeading}: ${paceValue}% (${paceLabel})`);
+    }
+
     return {
       content: [
         {
