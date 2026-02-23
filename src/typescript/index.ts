@@ -80,9 +80,9 @@ server.registerTool(
 
     lines.push("概要");
 
-    $(".Plan__Table").each((_, table) => {
-      const title = $(table).find(".Plan__Table__Title").text().trim();
-      const text = $(table).find(".Plan__Table__Text").text().trim();
+    $(".Plan__Table .Plan__Table__Tr").each((_, row) => {
+      const title = $(row).find(".Plan__Table__Title").text().trim();
+      const text = $(row).find(".Plan__Table__Text").text().trim();
       if (title) {
         lines.push(`${title}: ${text}`);
       }
@@ -90,9 +90,9 @@ server.registerTool(
 
     lines.push("計画データ");
 
-    $(".Plan__ActivityRecord").each((_, record) => {
-      const label = $(record).find(".Plan__ActivityRecord__Label").text().trim();
-      const score = $(record).find(".Plan__ActivityRecord__Score").text().trim();
+    $(".Plan__ActivityRecord__Item").each((_, item) => {
+      const label = $(item).find(".Plan__ActivityRecord__Label").text().trim();
+      const score = $(item).find(".Plan__ActivityRecord__Score").text().trim();
       if (label) {
         lines.push(`${label}: ${score}`);
       }
