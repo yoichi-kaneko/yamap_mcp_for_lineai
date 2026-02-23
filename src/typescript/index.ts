@@ -9,22 +9,66 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
-// Register tools
+// ツールの登録
 
-// Tool: playwright_test
+// URLの正規化処理
+// 受け付けるフォーマット:
+//   - https://yamap.com/plans/code/{CODE}
+//   - https://yamap.com/plans/code/{CODE}/printing -> 末尾の /printing を除去して使用
+// それ以外のURLはエラーとして扱う
+function normalizeYamapUrl(url: string): string {
+  const exactPattern = /^https:\/\/yamap\.com\/plans\/code\/[^/]+$/;
+  const printingPattern = /^https:\/\/yamap\.com\/plans\/code\/[^/]+(\/printing)$/;
+
+  if (exactPattern.test(url)) {
+    return url;
+  }
+
+  const printingMatch = url.match(printingPattern);
+  if (printingMatch) {
+    // 末尾の /printing を除去
+    return url.slice(0, url.length - printingMatch[1].length);
+  }
+
+  throw new Error(
+    `URLのフォーマットが正しくありません。\n` +
+    `受け付けるフォーマット:\n` +
+    `  - https://yamap.com/plans/code/{CODE}\n` +
+    `  - https://yamap.com/plans/code/{CODE}/printing\n` +
+    `指定されたURL: ${url}`,
+  );
+}
+
+// ツール: fetch_yamap_plan_page
 server.registerTool(
-  "playwright_test",
+  "fetch_yamap_plan_page",
   {
-    description: "Accesses a URL using Playwright Chromium and returns the full rendered HTML",
+    description: "YAMAPの山行計画ページのURLを受け取り、Playwright Chromiumでアクセスしてレンダリング済みのHTMLを返します",
     inputSchema: {
-      url: z.url().describe("The URL to access"),
+      url: z.url().describe("YAMAPの山行計画ページのURL"),
     },
   },
   async ({ url }) => {
+    // URLの検証と正規化
+    let normalizedUrl: string;
+    try {
+      normalizedUrl = normalizeYamapUrl(url);
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: error instanceof Error ? error.message : String(error),
+          },
+        ],
+        isError: true,
+      };
+    }
+
     const browser = await chromium.launch();
     const page = await browser.newPage();
 
-    await page.goto(url, { waitUntil: "networkidle" });
+    await page.goto(normalizedUrl, { waitUntil: "networkidle" });
 
     const content = await page.content();
 
