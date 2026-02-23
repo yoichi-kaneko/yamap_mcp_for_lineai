@@ -78,6 +78,7 @@ server.registerTool(
     const $ = cheerio.load(html);
     const lines: string[] = [];
 
+    // 概要テーブルからデータを取得
     lines.push("概要");
 
     $(".Plan__Table .Plan__Table__Tr").each((_, row) => {
@@ -88,6 +89,7 @@ server.registerTool(
       }
     });
 
+    // 計画データやコース定数などからデータを取得
     lines.push("計画データ");
 
     $(".Plan__ActivityRecord__Item").each((_, item) => {
@@ -111,6 +113,21 @@ server.registerTool(
     if (paceHeading) {
       lines.push(`${paceHeading}: ${paceValue}% (${paceLabel})`);
     }
+
+    // 移動計画からデータを取得
+    lines.push("移動計画");
+
+    $(".CheckPoints div").each((_, item) => {
+      const date = $(item).find(".CheckPoints__Heading").text().trim();
+      const sunriseSunset = $(item).find(".CheckPoints__SunriseSunset").text().trim();
+      const checkPoints = $(item).find(".CheckPoints__Item").map((_, point) => {
+        const time = $(point).find(".CheckPoints__Item__Time").text().trim();
+        const name = $(point).find(".CheckPoints__Item__Name").text().trim();
+        const lodging = $(point).find(".CheckPoints__Item__Lodging").text().trim();
+        return `${time} ${name} ${lodging}`;
+      }).get().join("\n");
+      lines.push(`${date}: ${sunriseSunset}\n${checkPoints}`);
+    });
 
     return {
       content: [
