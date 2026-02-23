@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import * as cheerio from "cheerio";
 import { chromium } from "playwright";
 import { z } from "zod";
 
@@ -70,15 +71,28 @@ server.registerTool(
 
     await page.goto(normalizedUrl, { waitUntil: "networkidle" });
 
-    const content = await page.content();
+    const html = await page.content();
 
     await browser.close();
+
+    const $ = cheerio.load(html);
+    const lines: string[] = [];
+
+    lines.push("概要");
+
+    $(".Plan__Table").each((_, table) => {
+      const title = $(table).find(".Plan__Table__Title").text().trim();
+      const text = $(table).find(".Plan__Table__Text").text().trim();
+      if (title) {
+        lines.push(`${title}: ${text}`);
+      }
+    });
 
     return {
       content: [
         {
           type: "text" as const,
-          text: content,
+          text: lines.join("\n"),
         },
       ],
     };
