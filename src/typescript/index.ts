@@ -90,6 +90,7 @@ server.registerTool(
     });
 
     // 計画データやコース定数などからデータを取得
+    lines.push("--------");
     lines.push("計画データ");
 
     $(".Plan__ActivityRecord__Item").each((_, item) => {
@@ -115,6 +116,7 @@ server.registerTool(
     }
 
     // 移動計画からデータを取得
+    lines.push("--------");
     lines.push("移動計画");
 
     $(".CheckPoints > div").each((_, item) => {
