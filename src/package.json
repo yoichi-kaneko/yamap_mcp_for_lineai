@@ -12,7 +12,8 @@
   "description": "MCP server for YAMAP integration with LINE AI",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "cheerio": "^1.2.0"
+    "cheerio": "^1.2.0",
+    "playwright": "^1.58.2"
   },
   "devDependencies": {
     "@types/node": "^22.15.29",

@@ -1,5 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { chromium } from "playwright";
+import { z } from "zod";
 
 // Create server instance
 const server = new McpServer({
@@ -9,18 +11,30 @@ const server = new McpServer({
 
 // Register tools
 
-// Tool: hallo
+// Tool: playwright_test
 server.registerTool(
-  "hallo",
+  "playwright_test",
   {
-    description: "Returns a hallo world message",
+    description: "Accesses a URL using Playwright Chromium and returns the full rendered HTML",
+    inputSchema: {
+      url: z.url().describe("The URL to access"),
+    },
   },
-  async () => {
+  async ({ url }) => {
+    const browser = await chromium.launch();
+    const page = await browser.newPage();
+
+    await page.goto(url, { waitUntil: "networkidle" });
+
+    const content = await page.content();
+
+    await browser.close();
+
     return {
       content: [
         {
           type: "text" as const,
-          text: "hallo world",
+          text: content,
         },
       ],
     };
