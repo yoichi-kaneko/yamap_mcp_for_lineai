@@ -117,7 +117,7 @@ server.registerTool(
     // 移動計画からデータを取得
     lines.push("移動計画");
 
-    $(".CheckPoints div").each((_, item) => {
+    $(".CheckPoints > div").each((_, item) => {
       const date = $(item).find(".CheckPoints__Heading").text().trim();
       const sunriseSunset = $(item).find(".CheckPoints__SunriseSunset").text().trim();
       const checkPoints = $(item).find(".CheckPoints__Item").map((_, point) => {
